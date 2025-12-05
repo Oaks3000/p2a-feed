@@ -5,6 +5,9 @@ on:
     paths:
       - 'papers/*.pdf'
 
+permissions:
+  contents: write
+
 jobs:
   process:
     runs-on: ubuntu-latest
