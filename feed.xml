@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+  <channel>
+    <title>Paper Summaries</title>
+    <link>https://oaks3000.github.io/p2a-feed/</link>
+    <description>Audio summaries of academic papers</description>
+    <language>en-us</language>
+    <itunes:author>Oakley</itunes:author>
+    <itunes:category text="Education"/>
+    
+    <!-- Episodes will be added here -->
+    
+  </channel>
+</rss>
