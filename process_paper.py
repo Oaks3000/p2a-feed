@@ -180,27 +180,47 @@ def find_sections(text):
     return sections
 
 def summarise_section(section_name, section_text):
-    prompt = f"""You are summarising the "{section_name}" section of an academic paper for an audio format.
+    # Skip preamble and title pages
+    if section_name.lower() in ["preamble", "title", "title page"]:
+        return None
+    
+    # Determine section type for tailored instructions
+    section_lower = section_name.lower()
+    
+    if any(word in section_lower for word in ["method", "data", "design", "sample"]):
+        section_guidance = "Keep this brief—one short paragraph. Focus only on what's essential to understand the findings. Skip routine procedural details."
+    elif any(word in section_lower for word in ["result", "finding", "analysis"]):
+        section_guidance = "Keep this to one or two paragraphs. Highlight the key findings in plain language. Only expand if something is genuinely surprising or important."
+    elif any(word in section_lower for word in ["discussion", "conclusion", "implication"]):
+        section_guidance = "This is important—give it proper attention. What are the takeaways? What should the listener remember?"
+    else:
+        section_guidance = "Summarise the key points concisely."
+    
+    prompt = f"""Summarise this section of an academic paper for a podcast-style audio format.
 
-Your audience is an intelligent listener who wants to understand the key points while commuting or exercising.
+SECTION: "{section_name}"
 
-Guidelines:
-- Use short, clear sentences suitable for listening
-- Avoid jargon where possible; explain technical terms briefly when needed
-- Don't reference figures, tables, or equations by number (the listener can't see them)
-- Summarise statistical findings in plain language (e.g., "significantly higher" rather than "p < 0.05")
-- Use signposting phrases like "The key finding here is..." or "The researchers approached this by..."
-- Aim for 2-3 paragraphs
+STYLE:
+- Sound like a knowledgeable friend explaining over coffee, not a lecturer
+- Casual but authoritative—you know this stuff well
+- Short, punchy sentences that work when spoken aloud
+- No jargon without a quick plain-English explanation
 
-Here is the section text:
+RULES:
+- Jump straight into the content. Never say things like "This section covers..." or "I'll summarise..."
+- Never reference figures, tables, or equation numbers
+- Convert statistics to plain language ("about twice as likely" not "OR = 2.1, p < 0.05")
+- Add brief critical observations where relevant ("One limitation here is..." or "What's clever about this approach is...")
+- {section_guidance}
 
+TEXT:
 {section_text}
 
-Provide your summary:"""
+Give your summary now, starting directly with the substance:"""
 
     message = claude.messages.create(
         model="claude-sonnet-4-20250514",
-        max_tokens=1000,
+        max_tokens=800,
         messages=[
             {"role": "user", "content": prompt}
         ]
@@ -208,7 +228,7 @@ Provide your summary:"""
     
     return message.content[0].text
 
-def text_to_speech(text, output_filename, voice="onyx"):
+def text_to_speech(text, output_filename, voice="nova"):
     max_chars = 4000
     
     paragraphs = text.split("\n\n")
@@ -307,7 +327,7 @@ def process_paper(pdf_path):
     print(f"Found {len(sections)} sections")
     print("")
     
-    summaries = {}
+   summaries = {}
     for section_name, section_text in sections.items():
         print(f"Summarising: {section_name}...")
         summary = summarise_section(section_name, section_text)
@@ -315,12 +335,28 @@ def process_paper(pdf_path):
     
     print("")
     
-    full_script = f"Summary of: {paper_name}\n\n"
+    # Create a clean title from filename
+    clean_title = paper_name.replace("_", " ").replace("-", " ")
+    
+    # Generate a brief intro
+    intro_prompt = f"""Write a 2-sentence podcast intro for a paper called "{clean_title}". 
+Be casual and intriguing—hook the listener. Don't say "welcome" or "today we're looking at". 
+Just set up what the paper is about and why it's interesting. Start directly."""
+    
+    intro_message = claude.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=150,
+        messages=[
+            {"role": "user", "content": intro_prompt}
+        ]
+    )
+    intro = intro_message.content[0].text
+    
+    full_script = f"{intro}\n\n"
     
     for section_name, summary in summaries.items():
-        full_script = full_script + f"{section_name.upper()}\n\n"
         full_script = full_script + summary + "\n\n"
-    
+
     # Generate audio
     print("Converting to audio (this may take a moment)...")
     audio_filename = f"{paper_name}_summary.mp3"
