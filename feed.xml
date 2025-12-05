@@ -19,5 +19,14 @@
       <guid>https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/test_paper_summary.mp3</guid>
     </item>
     
+  
+    <item>
+      <title>paper1</title>
+      <description>Summary of: paper1  PREAMBLE  I don't see any text provided for the "preamble" section you'd like me to summarize. Could you please share the section text you want me to convert into an audio-friendly...</description>
+      <pubDate>Fri, 05 Dec 2025 10:12:31 +0000</pubDate>
+      <enclosure url="https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/paper1_summary.mp3" type="audio/mpeg"/>
+      <guid>https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/paper1_summary.mp3</guid>
+    </item>
+    
   </channel>
 </rss>
