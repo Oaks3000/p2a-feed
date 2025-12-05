@@ -10,5 +10,14 @@
     
     <!-- Episodes will be added here -->
     
+  
+    <item>
+      <title>test_paper</title>
+      <description>Summary of: test_paper  PREAMBLE  This study tackles a fundamental question in entrepreneurship: what makes early-stage investors choose to fund one startup over another? The researchers approached th...</description>
+      <pubDate>Fri, 05 Dec 2025 09:58:45 +0000</pubDate>
+      <enclosure url="https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/test_paper_summary.mp3" type="audio/mpeg"/>
+      <guid>https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/test_paper_summary.mp3</guid>
+    </item>
+    
   </channel>
 </rss>
