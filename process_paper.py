@@ -327,11 +327,12 @@ def process_paper(pdf_path):
     print(f"Found {len(sections)} sections")
     print("")
     
-   summaries = {}
+    summaries = {}
     for section_name, section_text in sections.items():
         print(f"Summarising: {section_name}...")
         summary = summarise_section(section_name, section_text)
-        summaries[section_name] = summary
+        if summary is not None:
+            summaries[section_name] = summary
     
     print("")
     
@@ -356,7 +357,7 @@ Just set up what the paper is about and why it's interesting. Start directly."""
     
     for section_name, summary in summaries.items():
         full_script = full_script + summary + "\n\n"
-
+    
     # Generate audio
     print("Converting to audio (this may take a moment)...")
     audio_filename = f"{paper_name}_summary.mp3"
@@ -385,4 +386,3 @@ if len(pdf_files) == 0:
 else:
     for pdf_path in pdf_files:
         process_paper(pdf_path)
-
