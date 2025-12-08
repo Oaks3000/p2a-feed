@@ -64,5 +64,14 @@
       <guid>https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/State_or_trait_effects_of_state_optimism_on_job-related_outcomes_summary.mp3</guid>
     </item>
     
+  
+    <item>
+      <title>Marangudakis-SocialSourcesEnvironmental-2006</title>
+      <description>Ever wonder why some societies embrace environmental protection while others seem to ignore looming ecological disasters? Sociologist Manussos Marangudakis dug into this puzzle in 2006, uncovering how...</description>
+      <pubDate>Mon, 08 Dec 2025 10:42:57 +0000</pubDate>
+      <enclosure url="https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/Marangudakis-SocialSourcesEnvironmental-2006_summary.mp3" type="audio/mpeg"/>
+      <guid>https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/Marangudakis-SocialSourcesEnvironmental-2006_summary.mp3</guid>
+    </item>
+    
   </channel>
 </rss>
