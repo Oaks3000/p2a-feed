@@ -261,6 +261,7 @@ SCRIPT:
     
     return message.content[0].text
 
+
 def text_to_speech(text, output_filename, voice="nova"):
     max_chars = 4000
     
