@@ -229,7 +229,7 @@ Give your summary now, starting directly with the substance:"""
     
     return message.content[0].text
 
-    def review_and_tighten(full_script):
+def review_and_tighten(full_script):
     prompt = f"""Review this podcast script and remove repetition. 
 
 The script was generated section-by-section, so it likely repeats:
