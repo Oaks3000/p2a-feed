@@ -424,3 +424,4 @@ if len(pdf_files) == 0:
 else:
     for pdf_path in pdf_files:
         process_paper(pdf_path)
+
