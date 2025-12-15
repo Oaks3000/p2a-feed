@@ -211,6 +211,7 @@ RULES:
 - Never reference figures, tables, or equation numbers
 - Convert statistics to plain language ("about twice as likely" not "OR = 2.1, p < 0.05")
 - Add brief critical observations where relevant ("One limitation here is..." or "What's clever about this approach is...")
+- Never use phrases like "here's the thing", "here's the kicker", "here's what's interesting", "the bottom line"
 - {section_guidance}
 
 TEXT:
@@ -221,6 +222,38 @@ Give your summary now, starting directly with the substance:"""
     message = claude.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=800,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    
+    return message.content[0].text
+
+    def review_and_tighten(full_script):
+    prompt = f"""Review this podcast script and remove repetition. 
+
+The script was generated section-by-section, so it likely repeats:
+- The study's purpose or research question
+- Methodology descriptions
+- Key findings mentioned multiple times
+
+Edit the script to:
+1. Keep the first mention of any repeated concept, remove or heavily condense subsequent mentions
+2. Remove phrases like "here's the thing", "here's the kicker", "here's what's interesting", "the bottom line"
+3. Smooth transitions between sections
+4. Keep the casual, conversational tone
+5. Aim for 5-10 minutes of audio (roughly 700-1400 words)
+
+One or two light callbacks to earlier points is fine, but no redundant explanations.
+
+Return ONLY the edited script, nothing else.
+
+SCRIPT:
+{full_script}"""
+
+    message = claude.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=3000,
         messages=[
             {"role": "user", "content": prompt}
         ]
@@ -357,6 +390,10 @@ Just set up what the paper is about and why it's interesting. Start directly."""
     
     for section_name, summary in summaries.items():
         full_script = full_script + summary + "\n\n"
+    
+    # Review and tighten the full script
+    print("Reviewing for repetition...")
+    full_script = review_and_tighten(full_script)
     
     # Generate audio
     print("Converting to audio (this may take a moment)...")
