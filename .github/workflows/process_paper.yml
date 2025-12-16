@@ -33,7 +33,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python process_paper.py
+        run: python p2a_process.py
       
       - name: Commit and push results
         run: |
