@@ -217,5 +217,23 @@
       <guid>https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/McGEE-PERCEPTIONCONTROLINFLUENCES-2015_summary.mp3</guid>
     </item>
     
+  
+    <item>
+      <title>Sedlek-GrowthPotentialStartups-2017</title>
+      <description>Back in 2017, researcher Sedlek dove deep into what separates the startups that explode from those that fizzle out, and what they found might surprise you. We're talking about growth potential indicat...</description>
+      <pubDate>Tue, 16 Dec 2025 09:16:14 +0000</pubDate>
+      <enclosure url="https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/Sedlek-GrowthPotentialStartups-2017_summary.mp3" type="audio/mpeg"/>
+      <guid>https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/Sedlek-GrowthPotentialStartups-2017_summary.mp3</guid>
+    </item>
+    
+  
+    <item>
+      <title>Splitter-MinersLuck-1956</title>
+      <description>Back in 1956, a group of coal miners in West Virginia stumbled onto something that would completely change how we think about underground resource extraction—and it had nothing to do with the coal the...</description>
+      <pubDate>Tue, 16 Dec 2025 09:18:24 +0000</pubDate>
+      <enclosure url="https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/Splitter-MinersLuck-1956_summary.mp3" type="audio/mpeg"/>
+      <guid>https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/Splitter-MinersLuck-1956_summary.mp3</guid>
+    </item>
+    
   </channel>
 </rss>
