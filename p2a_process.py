@@ -1,3 +1,4 @@
+
 import os
 import re
 import subprocess
@@ -362,6 +363,11 @@ LIMITATIONS:
 OPEN_QUESTIONS:
 [1-2 bullet points starting with "- ": What remains unresolved?]
 
+RELATED_PAPERS:
+[Extract 3-5 key papers cited in the introduction/literature review that the authors use to build their case. For each paper, use this format:
+- **Author (Year)** — Brief explanation of what this paper established and why the current authors cite it
+Focus on papers that directly motivate or set up the current study's research question. These are the intellectual foundations the authors are building on.]
+
 SUMMARY:
 [2-3 sentence overview in plain language]
 
@@ -419,6 +425,7 @@ def create_obsidian_markdown(metadata, summary_sections, paper_name):
     strengths = summary_sections.get("STRENGTHS", "")
     limitations = summary_sections.get("LIMITATIONS", "")
     open_questions = summary_sections.get("OPEN_QUESTIONS", "")
+    related_papers = summary_sections.get("RELATED_PAPERS", "")
     summary = summary_sections.get("SUMMARY", "")
     
     markdown_content = f"""---
@@ -497,8 +504,9 @@ tags:
 
 
 ### Related Papers
-- [[]]
-- [[]]
+*Key works cited in the introduction that this paper builds upon:*
+
+{related_papers}
 
 ### Key Concepts
 - [[]]
