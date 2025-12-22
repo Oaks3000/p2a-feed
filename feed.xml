@@ -235,5 +235,14 @@
       <guid>https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/Splitter-MinersLuck-1956_summary.mp3</guid>
     </item>
     
+  
+    <item>
+      <title>paying for useless advice</title>
+      <description>Ever paid a financial advisor only to get advice you could've googled, or hired a consultant who told you things you already knew? This paper digs into why we keep shelling out cash for advice that ad...</description>
+      <pubDate>Mon, 22 Dec 2025 13:43:59 +0000</pubDate>
+      <enclosure url="https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/paying for useless advice_summary.mp3" type="audio/mpeg"/>
+      <guid>https://raw.githubusercontent.com/oaks3000/p2a-feed/main/audio/paying for useless advice_summary.mp3</guid>
+    </item>
+    
   </channel>
 </rss>
