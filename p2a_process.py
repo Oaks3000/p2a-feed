@@ -276,6 +276,250 @@ def add_to_podcast_feed(title, audio_filename, description):
     with open(feed_path, "w") as f:
         f.write(feed_content)
 
+
+# =============================================================================
+# NEW: Obsidian Markdown Summary Generation
+# =============================================================================
+
+def extract_metadata(raw_text, cleaned_text):
+    """Use Claude to extract paper metadata from the text."""
+    # Take first ~3000 chars which typically contains title, authors, abstract
+    header_text = raw_text[:3000]
+    
+    prompt = f"""Extract metadata from this academic paper header. Return ONLY a JSON object with these fields:
+- title: the paper's title (clean it up if needed)
+- authors: comma-separated list of author names
+- year: publication year (4 digits, or "unknown")
+- journal: journal/source name (or "unknown")
+- doi: DOI if present (or "unknown")
+
+If you can't find a field, use "unknown".
+
+TEXT:
+{header_text}
+
+Return ONLY the JSON object, no explanation:"""
+
+    message = claude.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=500,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    
+    response_text = message.content[0].text.strip()
+    
+    # Parse JSON response
+    import json
+    try:
+        # Handle potential markdown code blocks
+        if response_text.startswith("```"):
+            response_text = re.sub(r'^```json?\n?', '', response_text)
+            response_text = re.sub(r'\n?```$', '', response_text)
+        metadata = json.loads(response_text)
+    except json.JSONDecodeError:
+        metadata = {
+            "title": "unknown",
+            "authors": "unknown", 
+            "year": "unknown",
+            "journal": "unknown",
+            "doi": "unknown"
+        }
+    
+    return metadata
+
+
+def generate_obsidian_summary(cleaned_text, metadata, paper_name):
+    """Generate a structured summary for the Obsidian template."""
+    
+    # Take a substantial portion of the paper for analysis
+    analysis_text = cleaned_text[:12000] if len(cleaned_text) > 12000 else cleaned_text
+    
+    prompt = f"""Analyse this academic paper and provide structured information for a research summary template.
+
+Return your response in this EXACT format with these section headers:
+
+RESEARCH_QUESTION:
+[1-3 sentences: What problem or question does this paper address?]
+
+METHODOLOGY:
+[1-2 sentences: How did the researchers approach the problem?]
+
+KEY_FINDINGS:
+[3 bullet points, each starting with "- ": the main results or conclusions]
+
+CORE_ARGUMENT:
+[2-3 sentences: What is the central thesis or contribution?]
+
+EVIDENCE:
+[1-2 sentences: What data or reasoning supports the claims?]
+
+STRENGTHS:
+[1-2 bullet points starting with "- "]
+
+LIMITATIONS:
+[1-2 bullet points starting with "- "]
+
+OPEN_QUESTIONS:
+[1-2 bullet points starting with "- ": What remains unresolved?]
+
+SUMMARY:
+[2-3 sentence overview in plain language]
+
+PAPER TEXT:
+{analysis_text}
+
+Respond with ONLY the formatted sections above, nothing else:"""
+
+    message = claude.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=1500,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    
+    response = message.content[0].text
+    
+    # Parse the response into sections
+    sections = {}
+    current_section = None
+    current_content = []
+    
+    for line in response.split('\n'):
+        line = line.strip()
+        if line.endswith(':') and line[:-1].upper().replace('_', '') == line[:-1].replace('_', ''):
+            # This looks like a section header
+            if current_section:
+                sections[current_section] = '\n'.join(current_content).strip()
+            current_section = line[:-1]
+            current_content = []
+        elif current_section:
+            current_content.append(line)
+    
+    # Don't forget the last section
+    if current_section:
+        sections[current_section] = '\n'.join(current_content).strip()
+    
+    return sections
+
+
+def create_obsidian_markdown(metadata, summary_sections, paper_name):
+    """Create the Obsidian markdown file from metadata and summary."""
+    
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
+    title = metadata.get("title", paper_name)
+    
+    # Clean title for use in filename
+    safe_title = re.sub(r'[^\w\s-]', '', title)[:50].strip()
+    
+    # Extract sections with fallbacks
+    research_question = summary_sections.get("RESEARCH_QUESTION", "")
+    methodology = summary_sections.get("METHODOLOGY", "")
+    key_findings = summary_sections.get("KEY_FINDINGS", "1. \n2. \n3. ")
+    core_argument = summary_sections.get("CORE_ARGUMENT", "")
+    evidence = summary_sections.get("EVIDENCE", "")
+    strengths = summary_sections.get("STRENGTHS", "")
+    limitations = summary_sections.get("LIMITATIONS", "")
+    open_questions = summary_sections.get("OPEN_QUESTIONS", "")
+    summary = summary_sections.get("SUMMARY", "")
+    
+    markdown_content = f"""---
+title: "{title}"
+authors: {metadata.get("authors", "")}
+year: {metadata.get("year", "")}
+journal: {metadata.get("journal", "")}
+doi: {metadata.get("doi", "")}
+date_read: {today}
+status: unread
+rating: 
+tags:
+  - paper
+  - 
+---
+
+# {title}
+
+## Citation
+> [!info] Reference
+> **Authors:** {metadata.get("authors", "")}
+> **Year:** {metadata.get("year", "")}
+> **Journal/Source:** {metadata.get("journal", "")}
+> **DOI/Link:** {metadata.get("doi", "")}
+
+---
+
+## Research Question
+*What problem or question does this paper address?*
+
+{research_question}
+
+## Methodology
+*How did the researchers approach the problem?*
+
+{methodology}
+
+## Key Findings
+*What are the main results or conclusions?*
+
+{key_findings}
+
+## Core Argument
+*What is the central thesis or contribution?*
+
+{core_argument}
+
+## Evidence & Support
+*What data or reasoning supports the claims?*
+
+{evidence}
+
+---
+
+## Critical Notes
+
+### Strengths
+
+{strengths}
+
+### Limitations
+
+{limitations}
+
+### Open Questions
+*What remains unresolved or needs further investigation?*
+
+{open_questions}
+
+---
+
+## Relevance & Connections
+
+### Why This Matters
+*How does this relate to your research or interests?*
+
+
+### Related Papers
+- [[]]
+- [[]]
+
+### Key Concepts
+- [[]]
+
+---
+
+## Notable Quotes
+> [!quote]
+> "Quote here" (p. )
+
+---
+
+## Summary
+*2-3 sentence overview in your own words*
+
+{summary}
+"""
+    
+    return markdown_content, safe_title
+
+
 def process_paper(pdf_path):
     paper_name = os.path.splitext(os.path.basename(pdf_path))[0]
     print(f"Processing: {pdf_path}")
@@ -288,6 +532,30 @@ def process_paper(pdf_path):
     sections = find_sections(cleaned_text)
     print(f"Found {len(sections)} sections")
     print("")
+    
+    # ===========================================
+    # NEW: Extract metadata and generate Obsidian summary
+    # ===========================================
+    print("Extracting paper metadata...")
+    metadata = extract_metadata(raw_text, cleaned_text)
+    print(f"  Title: {metadata.get('title', 'unknown')[:60]}...")
+    
+    print("Generating Obsidian summary...")
+    summary_sections = generate_obsidian_summary(cleaned_text, metadata, paper_name)
+    
+    markdown_content, safe_title = create_obsidian_markdown(metadata, summary_sections, paper_name)
+    
+    # Save markdown file
+    os.makedirs("summaries", exist_ok=True)
+    markdown_filename = f"{paper_name}.md"
+    markdown_path = f"summaries/{markdown_filename}"
+    with open(markdown_path, "w", encoding="utf-8") as f:
+        f.write(markdown_content)
+    print(f"  Saved: {markdown_path}")
+    print("")
+    # ===========================================
+    
+    # Continue with existing audio generation
     summaries = {}
     for section_name, section_text in sections.items():
         print(f"Summarising: {section_name}...")
@@ -323,6 +591,9 @@ Just set up what the paper is about and why it's interesting. Start directly."""
     os.makedirs("processed", exist_ok=True)
     os.rename(pdf_path, f"processed/{os.path.basename(pdf_path)}")
     print(f"Done processing: {paper_name}")
+    print(f"  Audio: audio/{audio_filename}")
+    print(f"  Summary: {markdown_path}")
+
 
 pdf_files = glob.glob("papers/*.pdf")
 if len(pdf_files) == 0:
